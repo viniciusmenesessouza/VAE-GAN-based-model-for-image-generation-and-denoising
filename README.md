@@ -7,7 +7,7 @@ This practical project aims to develop a deep learning model capable of generati
 
 To carry out this project, the VAE-GAN model will be implemented using PyTorch [1]. Each component consists of a Convolutional Neural Network, with its configuration adapted to a specific task (upsampling for the decoder/generator, downsampling for the encoder and discriminator). The GAN loss, <img src="https://latex.codecogs.com/gif.latex?\mathcal{L}_{\text{GAN}}" />, uses a binary cross-entropy loss with respect to Discriminator/Generator output, while the VAE loss, <img src="https://latex.codecogs.com/gif.latex?\mathcal{L}_{\text{VAE}}" />, uses log-likelihood (expressed in GAN discriminator) and a regularization term based on Kullback-Leibler divergence (<img src="https://latex.codecogs.com/gif.latex?\text{D}_{\text{KL}}" />). For the data sample x, with latent representation z, the mentioned losses are given by:
 
-<img src="https://latex.codecogs.com/gif.latex?\mathcal{L}=\mathcal{L}_{\text{Dis}_l}+\mathcal{L}_{\text{prior}}+\mathcal{L}_{\text{GAN}}" />
+<img src="https://latex.codecogs.com/png.latex?\dpi{200}\fg{AAAAAA}\mathcal{L}=\mathcal{L}_{\text{Dis}_l}+\mathcal{L}_{\text{prior}}+\mathcal{L}_{\text{GAN}}" />
 <img src="https://latex.codecogs.com/gif.latex?\mathcal{L}_{\text{GAN}}=\log(\text{Dis}(x))+\log(1-\text{Dis}(\text{Gen}(z)))" />
 <img src="https://latex.codecogs.com/gif.latex?\mathcal{L}_{\text{Dis}_l}=-\mathbb{E}_{q(z|x)}\left[\log{p(\text{Dis}_l(x)|z)}\right]" />
 <img src="https://latex.codecogs.com/gif.latex?\mathcal{L}_{\text{prior}}=\text{D}_{\text{KL}}(q(z|x)\|p(z))" />
