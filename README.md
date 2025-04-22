@@ -22,20 +22,20 @@ Our aim in this work is to have a model that is capable of generating and denois
 To evaluate image generation quality, two metrics are intended to be used: Inception Score (IS) [4] and Fréchet Inception Distance (FID) [5], both based on InceptionV3 features. IS evaluates image quality/diversity via KL divergence; FID compares feature distributions under a Gaussian assumption. Since these ignore overfitting [6], Precision, Recall, and F1-score are also used, computed via manifold distances [7]. For image denoising, Peak Signal to Noise Ratio (PSNR), Structural Similarity Index (SSIM), and Mean Squared Error (MSE) are the intended metrics to use [8, 9].
 
 ## References
-[1] Anders Boesen Lindbo Larsen et al. Autoencoding beyond pixels using a learned similarity metric. 2015. doi: 10.48550/ARXIV.1512.09300. url: https://arxiv.org/abs/1512.09300.
+[1] Anders Boesen Lindbo Larsen et al. Autoencoding beyond pixels using a learned similarity metric. 2015. doi: 10.48550/ARXIV.1512.09300. url: https://arxiv.org/abs/1512.09300
 
-[2] Adam Paszke et al. ‘PyTorch: An Imperative Style, High-Performance Deep Learning Library’. In: Advances in Neural Information Processing Systems 32. Curran Associates, Inc., 2019, pp. 8024–8035.
+[2] Adam Paszke et al. ‘PyTorch: An Imperative Style, High-Performance Deep Learning Library’. In: Advances in Neural Information Processing Systems 32. Curran Associates, Inc., 2019, pp. 8024–8035. url: https://arxiv.org/abs/1912.01703
 
-[3] Ziwei Liu et al. ‘Deep Learning Face Attributes in the Wild’. In: Proceedings of International Conference on Computer Vision (ICCV). Dec. 2015.
+[3] Ziwei Liu et al. ‘Deep Learning Face Attributes in the Wild’. In: Proceedings of International Conference on Computer Vision (ICCV). Dec. 2015. url: https://arxiv.org/abs/1411.7766
 
-[4] Tim Salimans et al. ‘Improved techniques for training gans’. In: Advances in neural information processing systems 29 (2016).
+[4] Tim Salimans et al. ‘Improved techniques for training gans’. In: Advances in neural information processing systems 29 (2016). url: https://arxiv.org/abs/1606.03498
 
-[5] Martin Heusel et al. ‘GANs trained by a two time-scale update rule converge to a local nash equilibrium’. In: Proceedings of the 31st International Conference on Neural Information Processing Systems. Red Hook, NY, USA: Curran Associates Inc., Dec. 2017, pp. 6629–6640.
+[5] Martin Heusel et al. ‘GANs trained by a two time-scale update rule converge to a local nash equilibrium’. In: Proceedings of the 31st International Conference on Neural Information Processing Systems. Red Hook, NY, USA: Curran Associates Inc., Dec. 2017, pp. 6629–6640. url: https://arxiv.org/abs/1706.08500
 
 [6] Zeeshan Ahmad et al. ‘Understanding GANs: fundamentals, variants, training challenges, applications, and open problems’. In: Multimedia Tools and Applications (May 2024). doi: 10.1007/s11042-024-19361-y.
 
-[7] Tuomas Kynkaanniemi et al. ‘Improved precision and recall metric for assessing generative models’. In: Proceedings of the 33rd International Conference on Neural Information Processing Systems. Red Hook, NY, USA: Curran Associates Inc., Dec. 2019, pp. 3927–3936.
+[7] Tuomas Kynkaanniemi et al. ‘Improved precision and recall metric for assessing generative models’. In: Proceedings of the 33rd International Conference on Neural Information Processing Systems. Red Hook, NY, USA: Curran Associates Inc., Dec. 2019, pp. 3927–3936.  url: https://arxiv.org/abs/1904.06991
 
-[8] Rini Smita Thakur et al. ‘Image De-Noising With Machine Learning: A Review’. In: IEEE Access 9 (2021), pp. 93338–93363. doi: 10.1109/ACCESS.2021.3092425.
+[8] Rini Smita Thakur et al. ‘Image De-Noising With Machine Learning: A Review’. In: IEEE Access 9 (2021), pp. 93338–93363. doi: 10.1109/ACCESS.2021.3092425. url: https://www.researchgate.net/publication/352806683
 
-[9] Rini Smita Thakur, Ram Narayan Yadav and Lalita Gupta. ‘State-of-art analysis of image denoising methods using convolutional neural networks’. In: IET Image Processing 13.13 (Nov.2019), pp. 2367–2380. doi: 10.1049/iet-ipr.2019.0157
+[9] Rini Smita Thakur, Ram Narayan Yadav and Lalita Gupta. ‘State-of-art analysis of image denoising methods using convolutional neural networks’. In: IET Image Processing 13.13 (Nov.2019), pp. 2367–2380. doi: 10.1049/iet-ipr.2019.0157.  url: https://www.researchgate.net/publication/335036812
