@@ -1,3 +1,5 @@
+# %%
+
 import os
 import random
 import torch
@@ -6,7 +8,13 @@ from matplotlib import pyplot as plt
 plt.rcParams.update({'font.size': 17})
 from dataset_code import get_dataset_loaders
 from encoder_model import Encoder
+from torchmetrics.image.inception import InceptionScore
+from torcheval.metrics import FrechetInceptionDistance
+from torcheval.metrics import PeakSignalNoiseRatio
+from torcheval.metrics import MeanSquaredError
+from torchmetrics.image import StructuralSimilarityIndexMeasure
 
+#%%
 
 def configure_seed(seed):
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -54,6 +62,29 @@ def main():
         mu, logvar = encoder(noisy)
         print(mu.shape, logvar.shape)
         quit()
-
+        
+    # metrics
+    inception_gt = InceptionScore().to(device)
+    inception = InceptionScore().to(device)
+    fid = FrechetInceptionDistance().to(device)
+    psnr_gt = PeakSignalNoiseRatio().to(device)
+    psnr = PeakSignalNoiseRatio().to(device)
+    mse = MeanSquaredError().to(device)
+    ssim = StructuralSimilarityIndexMeasure().to(device)
+    
+    # calculate on test set
+    # for noisy, clean in test_loader:
+    #     ...
+    #     inception_gt.update(clean)
+    #     inception.update(filtered)
+    #     fid.update(clean, true) 
+    #     fid.update(filtered, false) 
+    #     mse.update(clean, filtered)
+    #     psnr_gt.update(noisy, clean)     
+    #     psnr.update(noisy, filtered)
+    #     ssim.update(clean, filtered)
+    
 if __name__ == "__main__":
     main()
+
+# %%
