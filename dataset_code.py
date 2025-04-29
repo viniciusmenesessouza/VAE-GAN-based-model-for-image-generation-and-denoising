@@ -12,7 +12,7 @@ class CelebADataset(Dataset):
         # dataset_size: if None, the dataset has all images from the given folder
         self.image_folder = image_folder
         pattern = os.path.join(image_folder, '*.jpg')
-        self.image_paths = sorted(glob.iglob(pattern, recursive=False))
+        self.image_paths = list(glob.iglob(pattern, recursive=False))
         if dataset_size is not None:
             self.image_paths = self.image_paths[:dataset_size]
         self.image_size = image_size

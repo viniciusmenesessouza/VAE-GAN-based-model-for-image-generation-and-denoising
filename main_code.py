@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 plt.rcParams.update({'font.size': 17})
 from dataset_code import get_dataset_loaders
 from encoder_model import Encoder
+from decoder_model import Decoder
 from torchmetrics.image.inception import InceptionScore
 from torcheval.metrics import FrechetInceptionDistance
 from torcheval.metrics import PeakSignalNoiseRatio
@@ -34,12 +35,12 @@ def show_tensor_image(img_tensor, ax):
     ax.imshow(img)
     return ax
 
-def main():
+def main_train_VAE():
     configure_seed(seed=42)
 
     # from https://www.kaggle.com/datasets/jessicali9530/celeba-dataset
     imgs_paths = [
-        r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba'
+        r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba',
         r'C:\Users\rodri\celebA',
         r"dbfbfdbfdfbdbdf"
     ]
@@ -48,12 +49,12 @@ def main():
         if os.path.exists(path):
             imgs_path = path
             break
-
     if imgs_path is None:
         print('Choose valid dataset path')
         quit()    
 
-    train_loader, val_loader, test_loader, img_shape = get_dataset_loaders(imgs_path, noise_max_std=0.25, rect=True) # , image_size=(64, 64))
+    train_loader, val_loader, test_loader, img_shape = get_dataset_loaders(imgs_path, noise_max_std=0.25, rect=True, batch_size=1, image_size=(64, 64), dataset_size=100)
+
 
     # # show training images
     # for noisy, clean in train_loader:
@@ -65,9 +66,12 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     latent_dim = 100
     encoder = Encoder(img_shape, latent_dim).to(device)
+    decoder = Decoder(latent_dim).to(device)
 
+    print('TRAINING')
     # training loop
     for noisy, clean in train_loader:
+        print('GG')
         noisy = noisy.to(device)
         clean = clean.to(device)
         print(noisy.shape, clean.shape)
@@ -102,6 +106,6 @@ def main():
     #     ssim.update(clean, filtered)
     
 if __name__ == "__main__":
-    main()
+    main_train_VAE()
 
 # %%

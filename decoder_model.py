@@ -34,6 +34,7 @@ class Decoder(nn.Module):
         # By this point image should be h32 w32 d32
 
         self.upsample = nn.Upsample(scale_factor = 2)
+        self.final_pad = nn.ReflectionPad2d(1)
         self.fconv = nn.Conv2d(chan_dims[-1], 3, 3)
 
 
@@ -42,6 +43,7 @@ class Decoder(nn.Module):
         x = x.view(-1, 256, 4, 4)       # Outsize d256 h4 w4 
         x = self.cnn(x)                 # Out d32 h32 w32 
         x = self.upsample(x)
+        x = self.final_pad(x)
         x = self.fconv(x)
         # Outputs an image d3 h64 w64 
         return x
