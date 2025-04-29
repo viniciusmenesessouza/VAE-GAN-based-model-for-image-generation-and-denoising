@@ -38,10 +38,22 @@ def main():
     configure_seed(seed=42)
 
     # from https://www.kaggle.com/datasets/jessicali9530/celeba-dataset
-    imgs_path = r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba'
-    
+    imgs_paths = [
+        r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba'
+        r"dffdbdfbdb",
+        r"dbfbfdbfdfbdbdf"
+    ]
+    imgs_path = None
+    for path in imgs_paths:
+        if os.path.exists(path):
+            imgs_path = path
+            break
 
-    train_loader, val_loader, test_loader, img_shape = get_dataset_loaders(imgs_path, noise_max_std=0.25, rect=True, image_size=(64, 64))
+    if imgs_path is None:
+        print('Choose valid dataset path')
+        quit()    
+
+    train_loader, val_loader, test_loader, img_shape = get_dataset_loaders(imgs_path, noise_max_std=0.25, rect=True) # , image_size=(64, 64))
 
     # # show training images
     # for noisy, clean in train_loader:
@@ -61,6 +73,11 @@ def main():
         print(noisy.shape, clean.shape)
         mu, logvar = encoder(noisy)
         print(mu.shape, logvar.shape)
+        std = torch.exp(0.5 * logvar)
+        e_rand = torch.randn_like(mu, device=device)
+        z = mu + e_rand*std
+        img = decoder(z)
+        print(img.shape)
         quit()
         
     # metrics
