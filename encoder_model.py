@@ -1,9 +1,6 @@
 import torch
 import torch.nn as nn
 
-import torch
-import torch.nn as nn
-
 class ConvBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=4, stride=2):
         super(ConvBlock, self).__init__()
