@@ -40,7 +40,7 @@ def main():
     # from https://www.kaggle.com/datasets/jessicali9530/celeba-dataset
     imgs_paths = [
         r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba'
-        r"dffdbdfbdb",
+        r'C:\Users\rodri\celebA',
         r"dbfbfdbfdfbdbdf"
     ]
     imgs_path = None
