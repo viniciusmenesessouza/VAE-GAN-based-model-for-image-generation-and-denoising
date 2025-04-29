@@ -17,6 +17,7 @@ class ConvBlock(nn.Module):
         x = self.leaky_relu(x)
         return x
 
+# from https://arxiv.org/html/1610.00291v2
 class Encoder(nn.Module):
     def __init__(self, img_size, latent_dim):
         super(Encoder, self).__init__()
