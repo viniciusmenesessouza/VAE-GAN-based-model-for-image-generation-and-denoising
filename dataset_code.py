@@ -60,7 +60,7 @@ class CelebADataset(Dataset):
         noisy_img = self.add_noise(clean_img)
         return noisy_img, clean_img
 
-def get_dataset_loaders(path, batch_size=64, train_p=0.8, val_p=0.1, image_size=(218,178), noise_max_std=0.1, rect=True, dataset_size=None, num_workers=None):
+def get_dataset_loaders(path, batch_size=64, train_p=0.8, val_p=0.1, image_size=(218,178), noise_max_std=0.1, rect=True, dataset_size=None, num_workers=None, drop_last=False):
     if num_workers is None: num_workers = os.cpu_count() // 2
     dataset = CelebADataset(path, image_size, noise_max_std, rect, dataset_size)
     dataset_size = len(dataset)
@@ -68,7 +68,7 @@ def get_dataset_loaders(path, batch_size=64, train_p=0.8, val_p=0.1, image_size=
     val_size = round(val_p * dataset_size)
     test_size = dataset_size - train_size - val_size
     train_dataset, val_dataset, test_dataset = torch.utils.data.dataset.random_split(dataset, [train_size, val_size, test_size])
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=drop_last)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=drop_last)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=drop_last)
     return train_loader, val_loader, test_loader, dataset[0][0].numpy().shape
