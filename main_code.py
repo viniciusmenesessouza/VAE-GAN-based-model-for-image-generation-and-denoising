@@ -1,7 +1,7 @@
 # %%
 
 import os
-import random
+from utils import configure_seed, show_tensor_image
 import torch
 import numpy as np
 from tqdm.auto import tqdm
@@ -45,7 +45,7 @@ def train_vae():
     # from https://www.kaggle.com/datasets/jessicali9530/celeba-dataset
     imgs_paths = [
         r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba',
-        r'C:\Users\rodri\celebA',
+        r'C:\Users\rodri\celebA\img_align_celeba\img_align_celeba',
         r"dbfbfdbfdfbdbdf"
     ]
     imgs_path = None

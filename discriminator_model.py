@@ -15,7 +15,7 @@ class DisConvBlock(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, in_channels, h_in = 64, w_in = 64):
+    def __init__(self, in_channels = 3, h_in = 64, w_in = 64):
         super(Discriminator, self).__init__()
         self.conv = nn.Conv2d(in_channels, 32, kernel_size=5)
         self.relu = nn.ReLU()
