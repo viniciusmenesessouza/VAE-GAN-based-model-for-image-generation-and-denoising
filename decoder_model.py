@@ -36,6 +36,7 @@ class Decoder(nn.Module):
         self.upsample = nn.Upsample(scale_factor = 2)
         self.final_pad = nn.ReflectionPad2d(1)
         self.fconv = nn.Conv2d(chan_dims[-1], 3, 3)
+        self.output_activation = nn.Tanh()
 
 
     def forward(self, x):
@@ -46,4 +47,5 @@ class Decoder(nn.Module):
         x = self.final_pad(x)
         x = self.fconv(x)
         # Outputs an image d3 h64 w64 
+        x = self.output_activation(x)
         return x
