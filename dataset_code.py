@@ -134,7 +134,7 @@ class CelebADataset(Dataset):
         noisy_img = self.add_noise(clean_img)
         return noisy_img, clean_img
 
-def get_dataset_loaders(path, batch_size=64, train_p=0.8, val_p=0.1, image_size=(218,178), noise_max_std=0.1, rect=True, dataset_size=None, pickle_path='dataset_obj.pkl'):
+def get_dataset_loaders(path, batch_size=64, train_p=0.8, val_p=0.1, image_size=(218,178), noise_max_std=0.1, rect=True, dataset_size=None, pickle_path='dataset_gan_obj.pkl'):
     if os.path.exists(pickle_path):
         with open(pickle_path, "rb") as f:
             dataset = pickle.load(f)
@@ -150,6 +150,6 @@ def get_dataset_loaders(path, batch_size=64, train_p=0.8, val_p=0.1, image_size=
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)
-    with open('testloader_obj.pkl', "wb") as f:
-        pickle.dump(test_loader, f)
+    # with open('testloader_gan_obj.pkl', "wb") as f:
+    #     pickle.dump(test_loader, f)
     return train_loader, val_loader, test_loader, dataset[0][0].numpy().shape
