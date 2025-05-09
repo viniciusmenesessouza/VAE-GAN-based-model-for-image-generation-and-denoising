@@ -23,7 +23,7 @@ class Encoder(nn.Module):
         for i in range(1,len(channels)):
             layers.append(ConvBlock(channels[i-1], channels[i]))
         self.cnn = nn.Sequential(*layers)
-
+        
         temp_input = torch.zeros(1, img_size[0], img_size[1], img_size[2])
         temp_output = self.cnn(temp_input)
         self.flatten_size = temp_output.view(1, -1).size(1)

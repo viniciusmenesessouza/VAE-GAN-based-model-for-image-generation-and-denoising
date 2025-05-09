@@ -7,6 +7,7 @@ import numpy as np
 from tqdm.auto import tqdm
 from matplotlib import pyplot as plt
 plt.rcParams.update({'font.size': 17})
+import matplotlib.gridspec as gridspec
 from dataset_code import get_dataset_loaders
 from encoder_model import Encoder
 from decoder_model import Decoder
@@ -18,56 +19,29 @@ from torchmetrics.image import StructuralSimilarityIndexMeasure
 import torch.optim as optim
 import torch.nn as nn
 import pickle, glob, random
-
-#%%
-
-def configure_seed(seed):
-    os.environ["PYTHONHASHSEED"] = str(seed)
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-
-def show_tensor_image(img_tensor, ax):
-    img = img_tensor.clone().detach().cpu()
-    img = img * 0.5 + 0.5  # convert back from [-1, 1] to [0, 1]
-    img = img.permute(1, 2, 0)  # [C, H, W] -> [H, W, C]
-    img = img.numpy()
-    ax.imshow(img)
-    return ax
        
 def train_vae():
     configure_seed(seed=42)
 
-    # from https://www.kaggle.com/datasets/jessicali9530/celeba-dataset
-    imgs_paths = [
-        r'C:\Users\ruben\Documents\datasets\CelebA\img_align_celeba',
-        r'C:\Users\rodri\celebA\img_align_celeba\img_align_celeba',
-        r"dbfbfdbfdfbdbdf"
-    ]
-    imgs_path = None
-    for path in imgs_paths:
-        if os.path.exists(path):
-            imgs_path = path
-            break
-    if imgs_path is None:
-        print('Choose valid dataset path')
-        quit()    
-
-    train_loader, val_loader, test_loader, img_shape = get_dataset_loaders(imgs_path, noise_max_std=0.25, rect=False, batch_size=64, image_size=(64, 64))
+    # from https://www.kaggle.com/datasets/badasstechie/celebahq-resized-256x256
+    imgs_path = r'C:\Users\ruben\Documents\datasets\CelebAHQ'
+    batch_size = 64
+    noise_max_std = 0.5
+    train_loader, val_loader, img_shape = get_dataset_loaders(imgs_path, batch_size=batch_size)
 
     # # show training images
-    # for noisy, clean in train_loader:
-    #     for i in range(noisy.shape[0]):
-    #         show_tensor_image(noisy[i,:], plt.subplot(1,2,1))
-    #         show_tensor_image(clean[i,:], plt.subplot(1,2,2))
-    #         plt.show()
+    # for img in train_loader:
+    #     plt.figure(figsize=(9,9))
+    #     side_grid = int(np.sqrt(img.shape[0]))
+    #     gs1 = gridspec.GridSpec(side_grid, side_grid)
+    #     gs1.update(wspace=0, hspace=0) 
+    #     for i in range(side_grid**2):
+    #         show_tensor_image(img[i], plt.subplot(gs1[i]))
+    #     plt.tight_layout()
+    #     plt.show()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    latent_dim = 100
+    latent_dim = 200
     encoder = Encoder(img_shape, latent_dim).to(device)
     decoder = Decoder(latent_dim).to(device)
     optimizer = optim.Adam(
@@ -87,20 +61,24 @@ def train_vae():
         train_loop = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs} Train", leave=True)
         epoch_train_loss = 0.0
         
-        for noisy, clean in train_loop:
+        for img in train_loop:
+            noise = torch.randn_like(img) * noise_max_std
+            noisy = torch.clamp(img + noise, -1.0, 1.0)
+
             noisy = noisy.to(device, non_blocking=True)
-            clean = clean.to(device, non_blocking=True)
+            img = img.to(device, non_blocking=True)
             
             # Forward pass
             mu, logvar = encoder(noisy)
+            logvar = torch.clamp(logvar, min=-10, max=10)
             std = torch.exp(0.5 * logvar)
             z = mu + std * torch.randn_like(std)
             recon = decoder(z)
             
             # loss computation
-            recon_loss = vae_loss(recon, clean, reduction='sum')
+            recon_loss = vae_loss(recon, img, reduction='sum')
             kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-            total_loss = recon_loss + kl_loss * min(epoch/25, 1.0)
+            total_loss = recon_loss + kl_loss * min(epoch/num_epochs, 1.0)
             
             # Backpropagation
             optimizer.zero_grad()
@@ -123,15 +101,19 @@ def train_vae():
         val_loss = 0.0
         val_loop = tqdm(val_loader, desc=f"Epoch {epoch+1}/{num_epochs} Val", leave=True)
         with torch.no_grad():
-            for noisy, clean in val_loop:
+            for img in val_loop:
+                noise = torch.randn_like(img) * torch.rand(1)*noise_max_std
+                noisy = torch.clamp(img + noise, -1.0, 1.0)
+
                 noisy = noisy.to(device, non_blocking=True)
-                clean = clean.to(device, non_blocking=True)
+                img = img.to(device, non_blocking=True)
                 
                 mu, logvar = encoder(noisy)
+                logvar = torch.clamp(logvar, min=-10, max=10)
                 z = mu + torch.exp(0.5 * logvar) * torch.randn_like(logvar)
                 recon = decoder(z)
                 
-                recon_loss = nn.functional.mse_loss(recon, clean, reduction='sum')
+                recon_loss = nn.functional.mse_loss(recon, img, reduction='sum')
                 kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
                 val_loss += (recon_loss + kl_loss).item()
             
@@ -144,15 +126,24 @@ def train_vae():
             
             np.savez('vae_models\\vae_loss.npz', train_losses, val_losses)
 
-            if len(val_losses) == 1 or np.min(val_losses) > val_loss:
-                # recon = torch.clamp(recon, -1.0, 1.0)
-                indx = 0 # np.random.randint(0, noisy.shape[0])
-                plt.figure(figsize=(16,9))
-                show_tensor_image(noisy[indx,:], plt.subplot(1,3,1))
-                show_tensor_image(clean[indx,:], plt.subplot(1,3,2))
-                show_tensor_image(recon[indx,:], plt.subplot(1,3,3))
-                plt.tight_layout()
-                plt.savefig(f'vae_models\\valimg_{epoch:04d}.jpg')
+            indx = np.random.randint(0, noisy.shape[0])
+            plt.figure(figsize=(16,9))
+            show_tensor_image(noisy[indx,:], plt.subplot(1,3,1))
+            show_tensor_image(img[indx,:], plt.subplot(1,3,2))
+            show_tensor_image(recon[indx,:], plt.subplot(1,3,3))
+            plt.tight_layout()
+            plt.savefig(f'vae_models\\valimg_{epoch:04d}.jpg')
+            plt.close('all')
+
+            if (epoch % 10) == 0:
+                plt.figure(figsize=(10, 5))
+                plt.plot(train_losses, label='Train Loss')
+                plt.plot(val_losses, label='Val Loss')
+                plt.xlabel('Epoch')
+                plt.ylabel('Loss')
+                plt.grid()
+                plt.legend()
+                plt.savefig(f'vae_models\\a_losses.jpg')
                 plt.close('all')
                 
                 torch.save(encoder.state_dict(), f'vae_models\\vae_{epoch:04d}_encoder.pth')
@@ -415,7 +406,8 @@ def sample_vae_decoder(folder_path, dist_npz):
 
 
 if __name__ == "__main__":
-    # train_vae()
+    train_vae()
+    quit()
     # test_vae(r'vae_models\v3_25anneling_200dim', 200)
     # test_vae(r'vae_models\v4_noanneling_200dim', 200)
     # test_vae(r'vae_models\v5_25anneling_100dim', 100)

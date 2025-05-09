@@ -19,4 +19,6 @@ def show_tensor_image(img_tensor, ax):
     img = img.permute(1, 2, 0)  # [C, H, W] -> [H, W, C]
     img = img.numpy()
     ax.imshow(img)
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
     return ax

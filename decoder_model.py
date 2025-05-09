@@ -18,34 +18,29 @@ class DecConvBlock(nn.Module):
         x = self.lrelu(x)
         return x
 
-
 class Decoder(nn.Module):
     def __init__(self, latent_dim):
         super(Decoder, self).__init__()
-        # Nt: https://arxiv.org/html/1610.00291v2 uses latent dim 100
-        
-        self.fc = nn.Linear(latent_dim, 4*4*256)
 
-        chan_dims = (256, 128, 64, 32)
+        self.fc = nn.Linear(latent_dim, 4 * 4 * 512)  # more channels at the start
+
+        chan_dims = (512, 256, 128, 64, 32, 16)
         layers = []
         for i in range(1, len(chan_dims)):
             layers.append(DecConvBlock(chan_dims[i - 1], chan_dims[i]))
         self.cnn = nn.Sequential(*layers)
-        # By this point image should be h32 w32 d32
 
-        self.upsample = nn.Upsample(scale_factor = 2)
+        self.upsample = nn.Upsample(scale_factor=2)
         self.final_pad = nn.ReflectionPad2d(1)
-        self.fconv = nn.Conv2d(chan_dims[-1], 3, 3)
+        self.fconv = nn.Conv2d(chan_dims[-1], 3, kernel_size=3)
         self.output_activation = nn.Tanh()
-
 
     def forward(self, x):
         x = self.fc(x)
-        x = x.view(-1, 256, 4, 4)       # Outsize d256 h4 w4 
-        x = self.cnn(x)                 # Out d32 h32 w32 
-        x = self.upsample(x)
+        x = x.view(-1, 512, 4, 4)       # Start from 512×4×4
+        x = self.cnn(x)                 # Now should be 16×128×128
+        x = self.upsample(x)            # 16×256×256
         x = self.final_pad(x)
         x = self.fconv(x)
-        # Outputs an image d3 h64 w64 
         x = self.output_activation(x)
         return x
