@@ -8,3 +8,6 @@
 checkpoint
 sample
 model.py
+*.pt
+/data2
+/__pycache__
