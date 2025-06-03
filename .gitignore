@@ -5,3 +5,6 @@
 *.pkl
 *.npz
 *.pth
+checkpoint
+sample
+model.py
