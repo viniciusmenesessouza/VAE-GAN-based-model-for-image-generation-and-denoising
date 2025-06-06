@@ -144,16 +144,17 @@ class InvertibleConv(nn.Module):
         S = torch.diag(U)
         U = torch.triu(U, 1)
 
-        self.P = P # P is not optimized
+        self.register_buffer('P', P)
         self.L = nn.Parameter(L)
         self.U = nn.Parameter(U)
         self.S = nn.Parameter(torch.log(torch.abs(S)))
 
         # Upper, lower triangular masks
-        self.U_mask = torch.triu(torch.ones_like(U, device=device),1)
-        self.L_mask = self.U_mask.T
-        self.S_sign = torch.sign(S)
-        self.L_eye = torch.eye(self.L_mask.shape[0], device=device)
+        self.register_buffer('U_mask', torch.triu(torch.ones_like(U, device=device),1))
+        self.register_buffer('L_mask', torch.triu(torch.ones_like(U, device=device),1).T)
+        self.register_buffer('S_sign', torch.sign(S))
+        self.register_buffer('L_eye', torch.eye(self.L_mask.shape[0], device=device))
+
 
         self.log_det = log_det
 
@@ -182,7 +183,8 @@ class InvertibleConv(nn.Module):
     
     def reverse(self, y):
         weight = self.get_weight()
-        return nn.functional.conv2d(y, weight.squeeze().pinverse().unsqueeze(2).unsqueeze(3))
+        inverse_weight = torch.linalg.inv(weight.squeeze()).unsqueeze(2).unsqueeze(3)
+        return nn.functional.conv2d(y, inverse_weight)
 
 
 class AffineCoupling(nn.Module):
@@ -582,6 +584,7 @@ def train_glow(model, optimizer, dataset, device,
             image = torch.floor(image / 2 ** (8 - n_bits))
 
         image = image / n_bins - 0.5
+        breakpoint()
 
         if i == 0:
             with torch.no_grad():
@@ -606,7 +609,6 @@ def train_glow(model, optimizer, dataset, device,
         pbar.set_description(
                 f"Loss: {loss.item():.5f}; logP: {log_p.item():.5f}; logdet: {log_det.item():.5f}"
             )
-        breakpoint()
         # Save an image every X iterations
         if i % image_every == 0:
             with torch.no_grad():
